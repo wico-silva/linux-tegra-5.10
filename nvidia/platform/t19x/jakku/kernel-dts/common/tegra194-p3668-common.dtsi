@@ -145,7 +145,8 @@
 
 		ports {
 			usb2-0 {
-				mode = "otg";
+				mode = "host";
+				vbus-supply = <&battery_reg>;
 				status = "okay";
 #if TEGRA_XUSB_DT_VERSION >= DT_VERSION_3
 				usb-role-switch;
@@ -358,7 +359,7 @@
 			output-high;
 			gpios = <TEGRA194_AON_GPIO(CC, 0) GPIO_ACTIVE_LOW>;
 			label = "w-disable2";
-			status = "okay";
+			status = "disabled";
 		};
 		suspend_gpio: suspend-led-gpio {
 			gpio-hog;
