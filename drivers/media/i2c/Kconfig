@@ -809,6 +809,16 @@ config VIDEO_IMX319
 	  To compile this driver as a module, choose M here: the
 	  module will be called imx319.
 
+config WC_VIDEO_IMX334
+	tristate "Sony IMX334 sensor support"
+	depends on I2C && VIDEO_V4L2 && VIDEO_V4L2_SUBDEV_API
+	help
+	  This is a Video4Linux2 sensor-level driver for the Sony
+	  IMX334 camera sensor
+
+	  To compile this driver as a module, choose M here: the module
+	  will be called imx334.
+
 config VIDEO_IMX355
 	tristate "Sony IMX355 sensor support"
 	depends on I2C && VIDEO_V4L2
