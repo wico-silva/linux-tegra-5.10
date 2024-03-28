@@ -234,7 +234,7 @@
 				* Sensor embedded metadata height in units of rows.
 				* If sensor does not support embedded metadata value should be 0.
 				*/
-				mode0 {/*mode IMX334_MODE_3864X2180_CROP_60FPS*/
+				mode0 {/*mode IMX334_MODE_3864x2180_60FPS*/
 					mclk_khz = "37125";
 					num_lanes = "4";
 					tegra_sinterface = "serial_a";
@@ -274,7 +274,7 @@
 					default_exp_time = "1666";/* us */
 					embedded_metadata_height = "1";
 				};
-				mode1 {/*mode IMX334_MODE_3864X2180_CROP_60FPS*/
+				mode1 {/*mode IMX334_MODE_3864x2180_10FPS*/
 					mclk_khz = "37125";
 					num_lanes = "4";
 					tegra_sinterface = "serial_a";
@@ -303,8 +303,8 @@
 					min_hdr_ratio = "1";
 					max_hdr_ratio = "1";
 					framerate_factor = "1000000";
-					min_framerate = "10000000"; /* 60 */
-					max_framerate = "10000000"; /* 60 */
+					min_framerate = "10000000"; /* 10 */
+					max_framerate = "10000000"; /* 10 */
 					step_framerate = "1";
 					default_framerate= "10000000";
 					exposure_factor = "1000000";
@@ -314,7 +314,7 @@
 					default_exp_time = "1666";/* us */
 					embedded_metadata_height = "1";
 				};
-				mode2 {/*mode IMX334_MODE_3864X2180_CROP_60FPS*/
+				mode2 {/*mode IMX334_MODE_3864x2180_30FPS*/
 					mclk_khz = "37125";
 					num_lanes = "4";
 					tegra_sinterface = "serial_a";
@@ -343,8 +343,8 @@
 					min_hdr_ratio = "1";
 					max_hdr_ratio = "1";
 					framerate_factor = "1000000";
-					min_framerate = "30000000"; /* 60 */
-					max_framerate = "30000000"; /* 60 */
+					min_framerate = "30000000"; /* 30 */
+					max_framerate = "30000000"; /* 30 */
 					step_framerate = "1";
 					default_framerate= "30000000";
 					exposure_factor = "1000000";
@@ -484,7 +484,7 @@
 				* Sensor embedded metadata height in units of rows.
 				* If sensor does not support embedded metadata value should be 0.
 				*/
-				mode0 {/*mode IMX334_MODE_3864X2180_CROP_60FPS*/
+				mode0 {/*mode IMX334_MODE_3864x2180_60FPS*/
 					mclk_khz = "37125";
 					num_lanes = "4";
 					tegra_sinterface = "serial_c";
@@ -524,7 +524,7 @@
 					default_exp_time = "1666";/* us */
 					embedded_metadata_height = "1";
 				};
-				mode1 {/*mode IMX334_MODE_3864X2180_CROP_60FPS*/
+				mode1 {/*mode IMX334_MODE_3864x2180_10FPS*/
 					mclk_khz = "37125";
 					num_lanes = "4";
 					tegra_sinterface = "serial_c";
@@ -553,8 +553,8 @@
 					min_hdr_ratio = "1";
 					max_hdr_ratio = "1";
 					framerate_factor = "1000000";
-					min_framerate = "10000000"; /* 60 */
-					max_framerate = "10000000"; /* 60 */
+					min_framerate = "10000000"; /* 10 */
+					max_framerate = "10000000"; /* 10 */
 					step_framerate = "1";
 					default_framerate= "10000000";
 					exposure_factor = "1000000";
@@ -564,7 +564,7 @@
 					default_exp_time = "1666";/* us */
 					embedded_metadata_height = "1";
 				};
-				mode2 {/*mode IMX334_MODE_3864X2180_CROP_60FPS*/
+				mode2 {/*mode IMX334_MODE_3864x2180_30FPS*/
 					mclk_khz = "37125";
 					num_lanes = "4";
 					tegra_sinterface = "serial_c";
@@ -593,8 +593,8 @@
 					min_hdr_ratio = "1";
 					max_hdr_ratio = "1";
 					framerate_factor = "1000000";
-					min_framerate = "30000000"; /* 60 */
-					max_framerate = "30000000"; /* 60 */
+					min_framerate = "30000000"; /* 30 */
+					max_framerate = "30000000"; /* 30 */
 					step_framerate = "1";
 					default_framerate= "30000000";
 					exposure_factor = "1000000";
@@ -733,7 +733,7 @@
 				* Sensor embedded metadata height in units of rows.
 				* If sensor does not support embedded metadata value should be 0.
 				*/
-				mode0 {/*mode IMX334_MODE_3864X2180_CROP_30FPS*/
+				mode0 {/*mode IMX334_MODE_3864x2180_60FPS*/
 					mclk_khz = "37125";
 					num_lanes = "4";
 					tegra_sinterface = "serial_e";
@@ -773,7 +773,7 @@
 					default_exp_time = "1666";/* us */
 					embedded_metadata_height = "1";
 				};
-				mode1 {/*mode IMX334_MODE_3864X2180_CROP_30FPS*/
+				mode1 {/*mode IMX334_MODE_3864x2180_10FPS*/
 					mclk_khz = "37125";
 					num_lanes = "4";
 					tegra_sinterface = "serial_e";
@@ -802,8 +802,8 @@
 					min_hdr_ratio = "1";
 					max_hdr_ratio = "1";
 					framerate_factor = "1000000";
-					min_framerate = "10000000"; /* 60 */
-					max_framerate = "10000000"; /* 60 */
+					min_framerate = "10000000"; /* 10 */
+					max_framerate = "10000000"; /* 10 */
 					step_framerate = "1";
 					default_framerate= "10000000";
 					exposure_factor = "1000000";
@@ -813,7 +813,7 @@
 					default_exp_time = "1666";/* us */
 					embedded_metadata_height = "1";
 				};
-				mode2 {/*mode IMX334_MODE_3864X2180_CROP_30FPS*/
+				mode2 {/*mode IMX334_MODE_3864x2180_30FPS*/
 					mclk_khz = "37125";
 					num_lanes = "4";
 					tegra_sinterface = "serial_e";
@@ -842,8 +842,8 @@
 					min_hdr_ratio = "1";
 					max_hdr_ratio = "1";
 					framerate_factor = "1000000";
-					min_framerate = "30000000"; /* 60 */
-					max_framerate = "30000000"; /* 60 */
+					min_framerate = "30000000"; /* 30 */
+					max_framerate = "30000000"; /* 30 */
 					step_framerate = "1";
 					default_framerate= "30000000";
 					exposure_factor = "1000000";
@@ -920,7 +920,7 @@
 		 */
 		modules {
 			module0 {
-				badge = "imx334_bottomleft_imx334";
+				badge = "imx334_bottomleft_x41";
 				position = "bottomleft";
 				orientation = "0";
 				drivernode0 {
@@ -933,7 +933,7 @@
 				};
 			};
 			module1 {
-				badge = "imx334_bottomright_imx334";
+				badge = "imx334_bottomright_x42";
 				position = "bottomright";
 				orientation = "0";
 				drivernode0 {
@@ -946,7 +946,7 @@
 				};
 			};
 			module2 {
-				badge = "imx334_centerleft_imx334";
+				badge = "imx334_centerleft_x43";
 				position = "centerleft";
 				orientation = "0";
 				drivernode0 {

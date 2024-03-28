@@ -51,6 +51,12 @@
 #define IMX334_ANALOG_GAIN_ADDR_LSB			0x30E8 /* GAIN ADDR */
 
 #define IMX334_TEMP_REGISTER_ADDR			0x00
+#define IMX334_TEMP_CONFIG_ADDR				0x01
+#define IMX334_TEMP_LOW_ADDR				0x02
+#define IMX334_TEMP_HIGH_ADDR				0x03
+#define IMX334_TEMP_HIGH_MAX				80
+#define IMX334_TEMP_HIGH_MIN				20
+#define IMX334_TEMP_HIGH_DEFAULT			50
 
 static const struct of_device_id imx334_of_match[] = {
 	{ .compatible = "nvidia,imx334",},
@@ -138,18 +144,6 @@ static inline void imx334_get_gain_reg(imx334_reg *regs,
 static int test_mode;
 module_param(test_mode, int, 0644);
 
-static inline int imx334_read_reg(struct camera_common_data *s_data,
-				u16 addr, u8 *val)
-{
-	int err = 0;
-	u32 reg_val = 0;
-
-	err = regmap_read(s_data->regmap, addr, &reg_val);
-	*val = reg_val & 0xFF;
-
-	return err;
-}
-
 static inline int imx334_temp_read_reg(struct imx334 *priv,
 				u8 addr, u16 *val)
 {
@@ -157,6 +151,28 @@ static inline int imx334_temp_read_reg(struct imx334 *priv,
 	u32 reg_val = 0;
 
 	err = regmap_read(priv->temp_regmap, addr, &reg_val);
+	*val = reg_val & 0xFFFF;
+
+	return err;
+}
+
+static int imx334_temp_write_reg(struct imx334 *priv,
+				u8 addr, u16 val)
+{
+	int err;
+
+	err = regmap_write(priv->temp_regmap, addr, val);
+
+	return err;
+}
+
+static inline int imx334_read_reg(struct camera_common_data *s_data,
+				u16 addr, u8 *val)
+{
+	int err = 0;
+	u32 reg_val = 0;
+
+	err = regmap_read(s_data->regmap, addr, &reg_val);
 	*val = reg_val & 0xFF;
 
 	return err;
@@ -462,14 +478,14 @@ static ssize_t imx334_heater_debugfs_write(struct file *s,
 	buf_size = min(count, sizeof(buf) - 1);
 	if (copy_from_user(buf, user_buf, buf_size))
 		return -EFAULT;
-	if (buf[0] == 'e') {
+	if (buf[0] == '1') {
 		gpio_direction_output(priv->heater_gpio, 1);
 		gpio_set_value(priv->heater_gpio, 1);
 		priv->heater_enable = true;
 		return count;
 	}
 
-	if (buf[0] == 'd') {
+	if (buf[0] == '0') {
 		gpio_direction_output(priv->heater_gpio, 0);
 		gpio_set_value(priv->heater_gpio, 0);
 		priv->heater_enable = false;
@@ -486,15 +502,15 @@ static ssize_t imx334_heater_debugfs_read(struct file *s,
 	struct imx334 *priv =
 		((struct seq_file *)s->private_data)->private;
 	// int buf_size;
-	char buf[32];
+	char buf[50];
 
 	if (!user_buf || count <= 1)
 		return -EFAULT;
 
 	if (priv->heater_enable == false)
-		snprintf(buf, sizeof(buf), "heater disabled\n");
+		snprintf(buf, sizeof(buf), "Heater Off(1:on, 0:off)\n");
 	else
-		snprintf(buf, sizeof(buf), "heater enabled\n");
+		snprintf(buf, sizeof(buf), "Heater On(1:on, 0:off)\n");
 
 	if (clear_user(user_buf, count)) {
 		return -EIO;
@@ -512,17 +528,91 @@ static ssize_t imx334_temp_debugfs_read(struct file *s,
 	int err;
 	char buf[32];
 	u16 val = 0;
-	u32 temp;
+	int temp_real;
+	short temp;
 
 	if (!user_buf || count <= 1)
 		return -EFAULT;
 
 	err = imx334_temp_read_reg(priv, IMX334_TEMP_REGISTER_ADDR, &val);
-	temp = (u32)val * 625;// uint 0.0001
+
+	//12-bit mode
+	temp = (short)val;
+	temp_real = ((int)temp >> 4) * 625;// uint 0.0001 degree
 	if (err)
 		snprintf(buf, sizeof(buf), "It is not able to access\n");
 	else
-		snprintf(buf, sizeof(buf), "%d.%04d degree\n", temp/10000, temp%10000);
+		snprintf(buf, sizeof(buf), "%d.%04d degree\n", temp_real/10000, temp_real%10000);
+
+	if (clear_user(user_buf, count)) {
+		return -EIO;
+	}
+
+	return simple_read_from_buffer(user_buf, count, ppos, buf, strlen(buf));
+}
+
+static int imx334_set_temp_high(struct imx334 *priv, u16 t_high)
+{
+	u16 t_low;
+
+	t_low = t_high - 5; // for recovery
+	t_high = (u16)((u32)t_high * 10000 / 625 << 4);
+	t_low = (u16)((u32)t_low * 10000 / 625 << 4);
+	imx334_temp_write_reg(priv, IMX334_TEMP_HIGH_ADDR, t_high);
+	imx334_temp_write_reg(priv, IMX334_TEMP_LOW_ADDR, t_low);
+	return 0;
+}
+
+static ssize_t imx334_temp_high_debugfs_write(struct file *s,
+				const char __user *user_buf,
+				size_t count, loff_t *ppos)
+{
+   struct imx334 *priv =
+    ((struct seq_file *)s->private_data)->private;
+	char buf[255];
+	int buf_size;
+	short t_high;
+	int tmp;
+
+	if (!user_buf || count <= 1)
+		return -EFAULT;
+
+	memset(buf, 0, sizeof(buf));
+	buf_size = min(count, sizeof(buf) - 1);
+	if (copy_from_user(buf, user_buf, buf_size))
+		return -EFAULT;
+	if(kstrtoint(buf, 0, &tmp))
+		return -EFAULT;
+	tmp = (tmp > IMX334_TEMP_HIGH_MAX) ? IMX334_TEMP_HIGH_MAX : tmp;
+	tmp = (tmp < IMX334_TEMP_HIGH_MIN) ? IMX334_TEMP_HIGH_MIN : tmp;
+	t_high = (short)tmp;
+	imx334_set_temp_high(priv, (u16)t_high);
+
+	return count;
+}
+static ssize_t imx334_temp_high_debugfs_read(struct file *s,
+				char __user *user_buf,
+				size_t count, loff_t *ppos)
+{
+	struct imx334 *priv =
+		((struct seq_file *)s->private_data)->private;
+	int err;
+	char buf[32];
+	u16 val = 0;
+	int t_high;
+	short temp;
+
+	if (!user_buf || count <= 1)
+		return -EFAULT;
+
+	err = imx334_temp_read_reg(priv, IMX334_TEMP_HIGH_ADDR, &val);
+	//12-bit mode
+	temp = (short)val;
+	t_high = ((int)temp >> 4) * 625;// uint 0.0001 degree
+	if (err)
+		snprintf(buf, sizeof(buf), "It is not able to access\n");
+	else
+		snprintf(buf, sizeof(buf), "%d.%04d degree\n", t_high/10000, t_high%10000);
 
 	if (clear_user(user_buf, count)) {
 		return -EIO;
@@ -536,17 +626,13 @@ static int imx334_stats_show(struct seq_file *s, void *data)
 	return 0;
 }
 
-static int imx334_heater_debugfs_open(struct inode *inode, struct file *file)
-{
-	return single_open(file, imx334_stats_show, inode->i_private);
-}
-static int imx334_temp_debugfs_open(struct inode *inode, struct file *file)
+static int imx334_debugfs_open(struct inode *inode, struct file *file)
 {
 	return single_open(file, imx334_stats_show, inode->i_private);
 }
 
 static const struct file_operations imx334_heater_debugfs_fops = {
-	.open = imx334_heater_debugfs_open,
+	.open = imx334_debugfs_open,
 	.read = imx334_heater_debugfs_read,
 	.write = imx334_heater_debugfs_write,
 	.llseek = seq_lseek,
@@ -554,10 +640,17 @@ static const struct file_operations imx334_heater_debugfs_fops = {
 };
 
 static const struct file_operations imx334_temp_debugfs_fops = {
-	.open = imx334_temp_debugfs_open,
+	.open = imx334_debugfs_open,
 	.read = imx334_temp_debugfs_read,
 	// .write = imx334_temp_debugfs_write,
 	.write = NULL,
+	.llseek = seq_lseek,
+	.release = single_release,
+};
+static const struct file_operations imx334_temp_high_debugfs_fops = {
+	.open = imx334_debugfs_open,
+	.read = imx334_temp_high_debugfs_read,
+	.write = imx334_temp_high_debugfs_write,
 	.llseek = seq_lseek,
 	.release = single_release,
 };
@@ -586,7 +679,7 @@ static int imx334_debugfs_init(const char *dir_name,
 		return -ENOMEM;
 	}
 
-	fp = debugfs_create_file("heater_switch", S_IRUGO|S_IWUSR,
+	fp = debugfs_create_file("heater_on", S_IRUGO|S_IWUSR,
 		dp, priv, &imx334_heater_debugfs_fops);
 	if (!fp) {
 		dev_err(&i2c_client->dev, "%s: debugfs create file failed\n",
@@ -596,6 +689,14 @@ static int imx334_debugfs_init(const char *dir_name,
 	}
 	fp = debugfs_create_file("temperature", S_IRUGO|S_IWUSR,
 		dp, priv, &imx334_temp_debugfs_fops);
+	if (!fp) {
+		dev_err(&i2c_client->dev, "%s: debugfs create file failed\n",
+			__func__);
+		debugfs_remove_recursive(dp);
+		return -ENOMEM;
+	}
+	fp = debugfs_create_file("t_high", S_IRUGO|S_IWUSR,
+		dp, priv, &imx334_temp_high_debugfs_fops);
 	if (!fp) {
 		dev_err(&i2c_client->dev, "%s: debugfs create file failed\n",
 			__func__);
@@ -891,7 +992,7 @@ static int imx334_probe(struct i2c_client *client,
 	gpio_direction_output(priv->heater_gpio, 0);
 	gpio_set_value(priv->heater_gpio, 0);
 	priv->heater_enable = false;
-
+	imx334_set_temp_high(priv, IMX334_TEMP_HIGH_DEFAULT);
 	err = tegracam_v4l2subdev_register(tc_dev, true);
 	if (err) {
 		dev_err(dev, "tegra camera subdev registration failed\n");
