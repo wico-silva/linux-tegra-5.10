@@ -690,6 +690,12 @@ static imx334_reg *mode_table[] = {
 	= imx334_stop_slave,
 };
 
+static u32 imx334_frame_length[] = {
+	[IMX334_MODE_3864x2180_60FPS] = 2250,
+	[IMX334_MODE_3864x2180_10FPS] = 13500,
+	[IMX334_MODE_3864x2180_30FPS] = 4500,
+};
+
 static const int imx334_10fps[] = {
 	10,
 };

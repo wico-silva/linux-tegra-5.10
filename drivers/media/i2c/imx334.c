@@ -16,8 +16,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#define DEBUG 1
-
 #include <linux/slab.h>
 #include <linux/uaccess.h>
 #include <linux/gpio.h>
@@ -268,7 +266,7 @@ static int imx334_set_coarse_time(struct imx334 *priv, s64 val)
 		mode->control_properties.exposure_factor;
 
 	if (priv->frame_length == 0)
-		priv->frame_length = IMX334_MIN_FRAME_LENGTH;
+		priv->frame_length = imx334_frame_length[s_data->mode_prop_idx];
 
 	reg_shs1 = priv->frame_length - coarse_time_shs1 - 1;
 
@@ -308,6 +306,7 @@ static int imx334_set_frame_rate(struct tegracam_device *tc_dev, s64 val)
 	const struct sensor_mode_properties *mode =
 		&s_data->sensor_props.sensor_modes[s_data->mode_prop_idx];
 
+	//keep fixed frame rate
 	return 0;
 	frame_length = mode->signal_properties.pixel_clock.val *
 		mode->control_properties.framerate_factor /
@@ -799,7 +798,7 @@ static int imx334_set_mode(struct tegracam_device *tc_dev)
 	err = imx334_write_table(priv, mode_table[s_data->mode_prop_idx]);
 	if (err)
 		return err;
-
+	priv->frame_length = imx334_frame_length[s_data->mode_prop_idx];
 	msleep(20);
 	return 0;
 }

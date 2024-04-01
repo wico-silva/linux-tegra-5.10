@@ -309,7 +309,7 @@
 					default_framerate= "10000000";
 					exposure_factor = "1000000";
 					min_exp_time = "7"; /* us */
-					max_exp_time = "16665"; /* us */
+					max_exp_time = "999000"; /* us */
 					step_exp_time = "1";
 					default_exp_time = "1666";/* us */
 					embedded_metadata_height = "1";
@@ -349,7 +349,7 @@
 					default_framerate= "30000000";
 					exposure_factor = "1000000";
 					min_exp_time = "7"; /* us */
-					max_exp_time = "16665"; /* us */
+					max_exp_time = "33300"; /* us */
 					step_exp_time = "1";
 					default_exp_time = "1666";/* us */
 					embedded_metadata_height = "1";
@@ -559,7 +559,7 @@
 					default_framerate= "10000000";
 					exposure_factor = "1000000";
 					min_exp_time = "7"; /* us */
-					max_exp_time = "16665"; /* us */
+					max_exp_time = "999000"; /* us */
 					step_exp_time = "1";
 					default_exp_time = "1666";/* us */
 					embedded_metadata_height = "1";
@@ -599,7 +599,7 @@
 					default_framerate= "30000000";
 					exposure_factor = "1000000";
 					min_exp_time = "7"; /* us */
-					max_exp_time = "16665"; /* us */
+					max_exp_time = "33300"; /* us */
 					step_exp_time = "1";
 					default_exp_time = "1666";/* us */
 					embedded_metadata_height = "1";
@@ -808,7 +808,7 @@
 					default_framerate= "10000000";
 					exposure_factor = "1000000";
 					min_exp_time = "7"; /* us */
-					max_exp_time = "16665"; /* us */
+					max_exp_time = "999000"; /* us */
 					step_exp_time = "1";
 					default_exp_time = "1666";/* us */
 					embedded_metadata_height = "1";
@@ -848,7 +848,7 @@
 					default_framerate= "30000000";
 					exposure_factor = "1000000";
 					min_exp_time = "7"; /* us */
-					max_exp_time = "16665"; /* us */
+					max_exp_time = "33300"; /* us */
 					step_exp_time = "1";
 					default_exp_time = "1666";/* us */
 					embedded_metadata_height = "1";
