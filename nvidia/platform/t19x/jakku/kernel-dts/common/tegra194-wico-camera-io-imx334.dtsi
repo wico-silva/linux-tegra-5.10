@@ -16,15 +16,15 @@
  */
 #include "tegra194-wico-camera-imx334.dtsi"
 
-#define CAM0_PWDN	TEGRA194_MAIN_GPIO(P, 4)
-#define CAM2_PWDN	TEGRA194_MAIN_GPIO(R, 0)
-#define CAM3_PWDN	TEGRA194_MAIN_GPIO(Q, 3)
-
-
 #define CAMERA_I2C_MUX_BUS(x) (0x1E + x)
 #define CAM_HEATER_GPIO	TEGRA194_MAIN_GPIO(Q, 5)
-#define CAM_RESET   TEGRA194_AON_GPIO(CC, 3)
-#define CAM_RESET    TEGRA194_MAIN_GPIO(P, 5)
+#define CAM_RESET1   TEGRA194_MAIN_GPIO(P, 5)
+#define CAM_RESET0	TEGRA194_MAIN_GPIO(P, 4)
+
+// Pin 120 Cam Reset1 P, 5 (x4.1, x4.2)
+// Pin 114 Cam Reset0 P, 4 (x4.3)
+// pin 116: CAM0_MCLK = EXTPERIPH1_CLK (x4.3)
+// pin 122: CAM1_MCLK = EXTPERIPH2_CLK (x4.2, x4.1)
 
 /* camera control gpio definitions */
 
@@ -40,6 +40,7 @@
 			vcc_lp = "vcc";
 			force_bus_start = <CAMERA_I2C_MUX_BUS(0)>;
 
+            // x4.3
 			i2c@0 {
 				reg = <0>;
 				i2c-mux,deselect-on-exit;
@@ -54,11 +55,12 @@
 					clock-names = "extperiph1", "pllp_grtba";
 					mclk = "extperiph1";
 					channel = "a";
-					// reset-gpios = <&tegra_aon_gpio CAM_RESET GPIO_ACTIVE_HIGH>;
-					reset-gpios = <&tegra_main_gpio CAM_RESET GPIO_ACTIVE_HIGH>;
+					reset-gpios = <&tegra_main_gpio CAM_RESET0 GPIO_ACTIVE_HIGH>;
 					heater-gpios = <&tegra_main_gpio CAM_HEATER_GPIO GPIO_ACTIVE_HIGH>;
 				};
 			};
+
+            //x4.2
 			i2c@1 {
 				reg = <1>;
 				i2c-mux,deselect-on-exit;
@@ -68,17 +70,17 @@
 				imx334_c@37 {
 					/* Define any required hw resources needed by driver */
 					/* ie. clocks, io pins, power sources */
-					clocks = <&bpmp_clks TEGRA194_CLK_EXTPERIPH1>,
+					clocks = <&bpmp_clks TEGRA194_CLK_EXTPERIPH2>,
 							 <&bpmp_clks TEGRA194_CLK_PLLP_OUT0>;
-					clock-names = "extperiph1", "pllp_grtba";
-					mclk = "extperiph1";
+					clock-names = "extperiph2", "pllp_grtba";
+					mclk = "extperiph2";
 					channel = "c";
-					// reset-gpios = <&tegra_aon_gpio CAM_RESET GPIO_ACTIVE_HIGH>;
-					reset-gpios = <&tegra_main_gpio CAM_RESET GPIO_ACTIVE_HIGH>;
+					reset-gpios = <&tegra_main_gpio CAM_RESET1 GPIO_ACTIVE_HIGH>;
 					heater-gpios = <&tegra_main_gpio CAM_HEATER_GPIO GPIO_ACTIVE_HIGH>;
 				};
 			};
 
+            //x4.1
 			i2c@2 {
 				reg = <2>;
 				i2c-mux,deselect-on-exit;
@@ -88,13 +90,12 @@
 				imx334_e@37 {
 					/* Define any required hw resources needed by driver */
 					/* ie. clocks, io pins, power sources */
-					clocks = <&bpmp_clks TEGRA194_CLK_EXTPERIPH1>,
+					clocks = <&bpmp_clks TEGRA194_CLK_EXTPERIPH2>,
 							 <&bpmp_clks TEGRA194_CLK_PLLP_OUT0>;
-					clock-names = "extperiph1", "pllp_grtba";
-					mclk = "extperiph1";
+					clock-names = "extperiph2", "pllp_grtba";
+					mclk = "extperiph2";
 					channel = "e";
-					// reset-gpios = <&tegra_aon_gpio CAM_RESET GPIO_ACTIVE_HIGH>;
-					reset-gpios = <&tegra_main_gpio CAM_RESET GPIO_ACTIVE_HIGH>;
+					reset-gpios = <&tegra_main_gpio CAM_RESET1 GPIO_ACTIVE_HIGH>;
 					heater-gpios = <&tegra_main_gpio CAM_HEATER_GPIO GPIO_ACTIVE_HIGH>;
 				};
 			};
